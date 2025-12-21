@@ -22,8 +22,6 @@ from django.db import connection
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
-print(tmpPostgres)
-print(os.getenv("DATABASE_URL"))
 
 DATABASES = {
     'default': {
