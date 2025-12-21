@@ -1,0 +1,35 @@
+services:
+  # Serviço 1: O Banco de dados de mensagens (Redis)
+  redis:
+    image: redis:alpine
+    container_name: magalu_redis
+    ports:
+      - "6379:6379"
+
+  # Serviço 2: A sua API Django (Web)
+  web:
+    build: .
+    container_name: magalu_api
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app  # Sincroniza sua pasta local com o container (Hot Reload)
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0  # Note o host "redis"
+
+  # Serviço 3: O Robô (Celery Worker)
+  worker:
+    build: .
+    container_name: magalu_worker
+    # Comando para iniciar o worker do Celery
+    command: celery -A setup worker --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - web
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0

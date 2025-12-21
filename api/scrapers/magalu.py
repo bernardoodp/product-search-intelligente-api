@@ -8,7 +8,7 @@ def scrape_magalu(search_term=None):
     try: 
         with sync_playwright() as pw:
             browser = pw.chromium.launch(
-                    headless=False,  
+                    headless=True,  
                     args=["--start-maximized"] 
                 )
             
@@ -29,7 +29,7 @@ def scrape_magalu(search_term=None):
                 # Se cair aqui, tire um print para ver se apareceu captcha
                 page.screenshot(path="erro_bloqueio.png")
                 browser.close()
-                return f'Erro ao processar script {e}'
+                raise Exception("Elemento não encontrado") 
             # 4. Pega os produtos usando seletores de teste (data-testid)
             # Esses atributos não mudam como as classes css (sc-xyz...)
             produtos_html = page.query_selector_all('[data-testid="product-card-container"]')
@@ -38,7 +38,7 @@ def scrape_magalu(search_term=None):
 
             print(f"Encontrados {len(produtos_html)} cards. Processando os 10 primeiros...")
             for i, product in enumerate(produtos_html):
-                if i >= 1:
+                if i >= 10:
                     break
                 try:
                     # 1. TÍTULO
@@ -85,16 +85,7 @@ def scrape_magalu(search_term=None):
                 except Exception as e:
                     print(f"Erro ao ler item {i}: {e}")
 
-            # Exibe o resultado
-            print("-" * 30)
-            for item in collected_data:
-                print(f"Nome: {item['name']}")
-                print(f"Valor: {item['price']}")
-                print(f"Link: {item['product_url']}")
-                print(f"Imagem: {item["image_url"]}")
-                print("-" * 30)
-
             browser.close()
             return collected_data   
     except Exception as e:
-        return f'Erro ao processar script: {e}'
+        raise Exception("Elemento não encontrado")
