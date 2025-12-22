@@ -21,7 +21,7 @@ from api.views import ScrapeView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/", include("api.urls")),
-    path("api/scrape", ScrapeView.as_view())
+    path("api/scrape/", ScrapeView.as_view())
     
 ]
 

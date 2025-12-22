@@ -26,7 +26,7 @@ def scrape_magalu(search_term):
         
             page.wait_for_selector('[data-testid="product-card-container"]', timeout=30000)
             
-            print("Products found. Extracting data...")
+            print("Produtos enconrados. Extraindo dados...")
             produtos_html = page.query_selector_all('[data-testid="product-card-container"]')
             
             products = []
@@ -47,25 +47,16 @@ def scrape_magalu(search_term):
                         ) * 100
                     )
                     
-                    link_element = product.get_attribute('href')
 
                     link_image_element = product.query_selector('[data-testid="image"]')
                     image = link_image_element.get_attribute('src')
-                    
-                    if not link_element:
-                        link_element = product.query_selector('a')
-                    
-                    link = link_element
-                    if link:
-                        if not link.startswith('http'):
-                            link = site_url + link
-                    else:
-                        link = "Link não encontrado"
+
+                    link_element = product.get_attribute('href') if product.get_attribute('href') else 'Link não encontrado'
 
                     products.append({
                         "name": title,
                         "price": formatted_price,
-                        "product_url": link,
+                        "product_url": link_element,
                         "image_url": image,
                         "site_url": site_url
 

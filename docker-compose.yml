@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   db:
     image: postgres:15
@@ -6,11 +8,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=magaludb
-      - POSTGRES_USER=magaluuser
-      - POSTGRES_PASSWORD=magalupass
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "5433:5432"
+      - "5433:5432" 
 
   redis:
     image: redis:alpine
@@ -28,13 +30,14 @@ services:
       - "8000:8000"
     depends_on:
       - redis
-      - db 
+      - db
     environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - DB_HOST=db
-      - DB_NAME=magaludb
-      - DB_USER=magaluuser
-      - DB_PASS=magalupass
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_PORT=${DB_PORT}
 
   worker:
     build: .
@@ -45,13 +48,14 @@ services:
     depends_on:
       - redis
       - web
-      - db 
+      - db
     environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - DB_HOST=db
-      - DB_NAME=magaludb
-      - DB_USER=magaluuser
-      - DB_PASS=magalupass
-      
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_PORT=${DB_PORT}
+
 volumes:
   postgres_data:
