@@ -1,20 +1,42 @@
 from celery import shared_task
-# Importe seu scraper original e o repositório
 from api.scrapers.magalu import scrape_magalu 
+from api.scrapers.mercado_livre import scrape_mercado_livre
 from api.repository import ProductRepository
 
 @shared_task
 def task_execute_scraper(search_term):
     print(f"[WORKER] Iniciando busca por: {search_term}")
     
-    try:
-        produtos = scrape_magalu(search_term)
-        
-        if produtos:
-            ProductRepository.create_many_products(produtos)
-            return f"Sucesso! {len(produtos)} produtos salvos."
-        
-        return "Nenhum produto encontrado."
+    todos_produtos = []
+    erros = []
 
+    try:
+        print("Buscando no Magalu...")
+        produtos_magalu = scrape_magalu(search_term)
+        todos_produtos.extend(produtos_magalu)
+        print(f"Magalu retornou {len(produtos_magalu)} itens.")
     except Exception as e:
-        return f"Erro no scraper: {str(e)}"
+        print(f"Erro ao buscar no Magalu: {e}")
+        erros.append("Magalu falhou")
+
+    try:
+        print("Buscando no Mercado Livre...")
+        produtos_ml = scrape_mercado_livre(search_term)
+        todos_produtos.extend(produtos_ml)
+        print(f"Mercado Livre retornou {len(produtos_ml)} itens.")
+    except Exception as e:
+        print(f"Erro ao buscar no Mercado Livre: {e}")
+        erros.append("ML falhou")
+    if todos_produtos:
+        todos_produtos.sort(key=lambda x: x['price'])
+        
+        ProductRepository.create_many_products(todos_produtos)
+        
+        msg = f"Sucesso! {len(todos_produtos)} produtos salvos."
+        
+        if erros:
+            msg += f" (Atenção: {', '.join(erros)})"
+            
+        return msg
+    
+    return "Nenhum produto encontrado em nenhuma das lojas."

@@ -10,9 +10,12 @@ from django.shortcuts import render
 from .models import Product
 from .serializers import ProductSerializer
 from api.tasks import task_execute_scraper
+from rest_framework.renderers import TemplateHTMLRenderer
 
 
 class ScrapeView(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'scrape.html'
     def post(self, request):
         search_term = request.data.get('search_term')
         
