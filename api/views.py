@@ -47,10 +47,6 @@ class ProductsView(mixins.ListModelMixin, GenericViewSet):
 
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
-        response.data = [
-            {**product, 'price': product['price'] / 100} 
-            for product in response.data
-        ]
 
         return Response({'products': response.data})
 
