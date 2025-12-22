@@ -1,22 +1,30 @@
-from django.shortcuts import render
+# restframework 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from .models import Product
-from .serializers import ProductSerializer
 import rest_framework.mixins as mixins
 from rest_framework.viewsets import GenericViewSet
-from .services import ProductSearchService
+from rest_framework import status
+
+from django.shortcuts import render
+from .models import Product
+from .serializers import ProductSerializer
+from api.tasks import task_execute_scraper
 
 
 class ScrapeView(APIView):
     def post(self, request):
-        term = request.data.get('search_term')
-        try:
-            ProductSearchService().search_and_save(term)
-            return Response({"detail": "Sucesso"}, status=201)
-        except Exception as e:
-            return Response({"error": str(e)}, status=500)
+        search_term = request.data.get('search_term')
+        
+        if not search_term:
+            return Response({"erro": "Termo de busca obrigatório"}, status=400)
+    
+        task_execute_scraper.delay(search_term)
+        
+        return Response({
+            "message": "Robô iniciado em segundo plano!",
+            "status": "Processando"
+        }, status=status.HTTP_202_ACCEPTED)
 
 
 class ProductsView(mixins.ListModelMixin, GenericViewSet):
