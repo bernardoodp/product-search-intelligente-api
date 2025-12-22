@@ -4,9 +4,11 @@ from django.db import models
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.TextField()
     price = models.IntegerField()
-    image_url = models.CharField(max_length=255)
-    product_url = models.CharField(max_length=255)
-    site_url = models.CharField(max_length=255)
+    image_url = models.TextField()
+    product_url = models.TextField()
+    site_url = models.TextField()
 
+    def __str__(self):
+        return self.name

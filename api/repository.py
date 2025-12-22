@@ -4,6 +4,7 @@ from django.db import transaction, IntegrityError
 class ProductRepository():
 
     def create_many_products(products):
+        
         product_instances = [
             Product(**product_data)
             for product_data in products
@@ -14,5 +15,6 @@ class ProductRepository():
                 product_instances
             )
             return 
-        except Exception:
+        except Exception as e:
+            print(e)
             raise IntegrityError 

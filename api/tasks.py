@@ -7,32 +7,32 @@ from api.repository import ProductRepository
 def task_execute_scraper(search_term):
     print(f"[WORKER] Iniciando busca por: {search_term}")
     
-    todos_produtos = []
+    all_products = []
     erros = []
 
     try:
         print("Buscando no Magalu...")
-        produtos_magalu = scrape_magalu(search_term)
-        todos_produtos.extend(produtos_magalu)
-        print(f"Magalu retornou {len(produtos_magalu)} itens.")
+        magalu_products = scrape_magalu(search_term)
+        all_products.extend(magalu_products)
+        print(f"Magalu retornou {len(magalu_products)} itens.")
     except Exception as e:
         print(f"Erro ao buscar no Magalu: {e}")
         erros.append("Magalu falhou")
 
     try:
         print("Buscando no Mercado Livre...")
-        produtos_ml = scrape_mercado_livre(search_term)
-        todos_produtos.extend(produtos_ml)
-        print(f"Mercado Livre retornou {len(produtos_ml)} itens.")
+        ml_products = scrape_mercado_livre(search_term)
+        all_products.extend(ml_products)
+        print(f"Mercado Livre retornou {len(ml_products)} itens.")
     except Exception as e:
         print(f"Erro ao buscar no Mercado Livre: {e}")
         erros.append("ML falhou")
-    if todos_produtos:
-        todos_produtos.sort(key=lambda x: x['price'])
+    if all_products:
+        all_products.sort(key=lambda x: x['price'])
         
-        ProductRepository.create_many_products(todos_produtos)
+        ProductRepository.create_many_products(all_products)
         
-        msg = f"Sucesso! {len(todos_produtos)} produtos salvos."
+        msg = f"Sucesso! {len(all_products)} produtos salvos."
         
         if erros:
             msg += f" (Atenção: {', '.join(erros)})"

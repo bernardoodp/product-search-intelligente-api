@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-def scrape_mercado_livre_bs4(search_term):
+def scrape_mercado_livre(search_term):
     term_formatted = search_term.replace(' ', '-')
     url = f"https://lista.mercadolivre.com.br/{term_formatted}"
     site_url = "https://www.mercadolivre.com.br"
@@ -28,11 +28,10 @@ def scrape_mercado_livre_bs4(search_term):
         products = []
 
         for i, product in enumerate(products_html):
-            if i >= 1:
+            if i >= 10:
                 break
             
             try:
-                # TÍTULO (Tentando seletores novos 'poly' e antigos para garantir)
                 title_element = product.select_one('h3.poly-component__title-wrapper, h2.ui-search-item__title')
                 title = title_element.get_text(strip=True) if title_element else "Sem Título"
 
@@ -43,12 +42,9 @@ def scrape_mercado_livre_bs4(search_term):
                 else:
                     price = 0
 
-                # LINK
                 link_element = product.select_one('a.poly-component__title, a.ui-search-item__group__element')
                 link = link_element['href'] if link_element else None
 
-                # IMAGEM (Atenção ao Lazy Loading)
-                # O requests não roda JS, então a imagem real muitas vezes está em 'data-src'
                 img_element = product.select_one('img.poly-component__picture, img.ui-search-result-image__element')
                 image = None
                 if img_element:
@@ -71,8 +67,3 @@ def scrape_mercado_livre_bs4(search_term):
     except requests.exceptions.RequestException as e:
         print(f"Erro na requisição: {e}")
         return []
-
-# Teste
-if __name__ == "__main__":
-    resultado = scrape_mercado_livre_bs4("iphone 15")
-    print(resultado)
