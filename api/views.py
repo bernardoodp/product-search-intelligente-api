@@ -29,10 +29,8 @@ class ScrapeView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
     
-        # Dispara o Celery
         task_execute_scraper.delay(search_term)
         
-        # Retorna o template com mensagem de sucesso
         return Response({
             "message": f"Robô iniciado para o termo: '{search_term}'",
             "status": "Processando"
