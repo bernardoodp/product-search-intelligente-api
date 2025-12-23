@@ -8,7 +8,7 @@ def task_execute_scraper(search_term):
     print(f"[WORKER] Iniciando busca por: {search_term}")
     
     all_products = []
-    erros = []
+    errors = []
 
     try:
         print("Buscando no Magalu...")
@@ -17,7 +17,7 @@ def task_execute_scraper(search_term):
         print(f"Magalu retornou {len(magalu_products)} itens.")
     except Exception as e:
         print(f"Erro ao buscar no Magalu: {e}")
-        erros.append("Magalu falhou")
+        errors.append("Magalu falhou")
 
     try:
         print("Buscando no Mercado Livre...")
@@ -26,7 +26,7 @@ def task_execute_scraper(search_term):
         print(f"Mercado Livre retornou {len(ml_products)} itens.")
     except Exception as e:
         print(f"Erro ao buscar no Mercado Livre: {e}")
-        erros.append("ML falhou")
+        errors.append("ML falhou")
     if all_products:
         all_products.sort(key=lambda x: x['price'])
         
@@ -34,8 +34,8 @@ def task_execute_scraper(search_term):
         
         msg = f"Sucesso! {len(all_products)} produtos salvos."
         
-        if erros:
-            msg += f" (Atenção: {', '.join(erros)})"
+        if errors:
+            msg += f" (Atenção: {', '.join(errors)})"
             
         return msg
     

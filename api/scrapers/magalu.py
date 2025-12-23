@@ -47,7 +47,6 @@ def scrape_magalu(search_term):
                         ) * 100
                     )
                     
-
                     link_image_element = product.query_selector('[data-testid="image"]')
                     image = link_image_element.get_attribute('src')
 
