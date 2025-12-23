@@ -1,5 +1,3 @@
-# Nome do Seu Projeto
-
 API de processamento assíncrono integrada com Magalu e Mercado Livre, usando Django e Celery.
 
 ## Como Rodar
